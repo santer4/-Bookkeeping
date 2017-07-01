@@ -1,16 +1,27 @@
 import java.util.GregorianCalendar;
 
-
 public class MyEarning {
+    /**
+     * Опасная штука. В случае если объекты будут содаваться в многопоточной среде
+     * (swing вроде как многопоточный) нет никаких гарантий что такой подход проканает
+     * Лучше разруливать значение number откуда-нибудь снаружи
+     */
+    private static int count;
+
+    // Общее замечание. Если не предполагается что поле класса будет изменяемым.
+    // Его нужно сразу делать final
     private GregorianCalendar gregorianCalendar;
     private String nameMyAccount;
     private String category;
     private String subcategory;
     private double sum;
     private String note;
-    private static int count;
     private int number;
 
+    /**
+     * Конструкторы с большим количеством параметров не очень удобно воспринимать
+     * См. builder pattern
+     */
     public MyEarning(GregorianCalendar gregorianCalendar, String nameMyAccount,
                      String category, String subcategory, double sum, String note) {
         this.gregorianCalendar = gregorianCalendar;

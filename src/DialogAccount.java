@@ -72,7 +72,15 @@ public class DialogAccount extends DialogParent{
                 balance, new GregorianCalendar(year, month, day));
     }
 
-    //создание панели DialogAccount в виде диалогового окна
+    /**
+     * Создание панели DialogAccount в виде диалогового окна
+     *
+     * Тут наблиюдается классический случай побочного эффекта в методе. Такое бывает когда метод получает
+     * агрумент и меняет его в своем теле вместо того чтобы вернуть нормальный реультат.
+     *
+     * Побочные эффекты - зло и от них надо избавляться. Я бы создал какую-нибудь структуру которая содержала
+     * результат работы пользователя в диалоговом окне
+     */
     public boolean showAddDialogAccount(Component parent, String title, Set<String> namesAccountsSet, ArrayList<MyAccount> tempListAccounts, boolean edit){
         setEdit(edit);
         ok = false;

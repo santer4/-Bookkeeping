@@ -4,9 +4,15 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.stream.IntStream;
 
 
 //диалоговое окно с общими полями ввода и кнопками для всех диалоговых окон приложения
+
+/**
+ * Обычно такие классы наывают либо AbstractDialog (если он по сути абстрактный)
+ * либо CommonDialog (или вроде того)
+ */
 public class DialogParent extends JPanel {
 
     private JComboBox<Integer> dayComboBox;
@@ -37,6 +43,7 @@ public class DialogParent extends JPanel {
         JPanel panelDate = new JPanel();
         dayModel = new DefaultComboBoxModel<>();
 
+        // Это стоит вынести в final static
         String[] monthNames = {"Январь","Февраль","Март","Апрель","Май","Июнь","Июль","Август","Сентябрь","Октябрь","Ноябрь","Декабрь"};
         monthComboBox = new JComboBox<>(monthNames);
         monthComboBox.addActionListener(new MonthListener());
@@ -48,6 +55,9 @@ public class DialogParent extends JPanel {
         for(int i = 2000; i < maxYear + 1; i++){
             yearComboBox.addItem(i);
         }
+
+        // Тут можно попробовать что-то наподобие
+        // IntStream.range(2000, maxYear + 1).forEach(yearComboBox::addItem);
 
         dayComboBox = new JComboBox<>(dayModel);
 

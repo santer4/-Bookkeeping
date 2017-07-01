@@ -5,11 +5,25 @@ import java.awt.event.*;
 import java.io.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 /**
  * Компонент для вкладок Счета, Расходы, Доходы, График
+ *
+ * 1. Следует избегать расширения не-свойх классов. Как правило вместо этого можно обойтись
+ * композицией
+ *
+ * 2. Как правило, при разработке интерфейсов разделяют логику отображения и бизнесс-логику
+ * для этого используют паттерны вроде
+ * https://ru.wikipedia.org/wiki/Model-View-Presenter
+ * или
+ * https://ru.wikipedia.org/wiki/Model-View-Controller
+ *
  */
 public class IncomeExpense extends JTabbedPane {
     private PanelEarning earnings; //вкладка Доходы
@@ -24,6 +38,9 @@ public class IncomeExpense extends JTabbedPane {
     private TreeSet<MyExpense> expensesSet;
     private TreeSet<MyEarning> earningsSet;
 
+    /**
+     * Название переменной должно быть понятнее
+     */
     private boolean edit = false;
 
     public IncomeExpense() {
@@ -112,13 +129,25 @@ public class IncomeExpense extends JTabbedPane {
         }
     }
 
-    //метод для заполнения списка расходов, записанных в файле
+    /**
+     * метод для заполнения списка расходов, записанных в файле
+     *
+     * Это однозначно должно быть в отдельном сервисе
+     */
     public void fillExpensesSet() {
+        // Общее замечание. Переменные должны объявляться как можно ближе к их использованию
+        // нет ничего страшного если переменная объявляется внутри цикла. Иначе код начинает ноправданно разрастаться
+        // Я ни разу не видел чтобы так хранили дату. Смотри либо в сторону Date либо более новых LocalDate LocalDateTime
         GregorianCalendar calendar;
         try{
             //заполнение списка Расходов
+            // Может сначала проверить что файл существует? Что будет если забыли задать свойство?
             File fileInputExpenses = new File(System.getProperty("user.dir") + "\\Data\\ExpenseSet.txt");
             BufferedReader readerExpenses = new BufferedReader(new InputStreamReader(new FileInputStream(fileInputExpenses), "UTF-8"));
+
+            // Общее замечание. Один из принципов SOLID - Dependency Inversion предполагает что код
+            // изпользующий обект не должен знать ничего о его реализации. Поэтому вместо ArrayList
+            // нужно объявлять либо List либо Collection
             ArrayList<String> listExpenses = new ArrayList<>();
             String lineExpenses;
             while ((lineExpenses = readerExpenses.readLine()) != null) {
@@ -150,13 +179,25 @@ public class IncomeExpense extends JTabbedPane {
                     expensesSet.add(new MyExpense(category, subcategory, nameMyAccount, calendar, quantity, unitMeasure, sum, note));
                 }
             }
+            // Ресурсы которые требуют освобождения освобождают в блоке finally
+            // До этого места код может и не дойти
+            // А вообще лучше испольовать try-with-resources
             readerExpenses.close();
         } catch (IOException e){
             e.printStackTrace();
         }
+
+        // Вообще такой подход к чтению файлов устарел я бы следал как-то так
+        // См. streams
+        // expensesSet = Files.lines(Paths.get("path.txt"))
+        //        .map(line -> new MyExpense(...))
+        //        .collect(Collectors.toList())
     }
 
-    //метод для заполнения списка доходов, записанных в файле
+    /**
+     * метод для заполнения списка доходов, записанных в файле
+     * то же что и в предыдущем методе
+     */
     public void fillEarningsSet() {
         GregorianCalendar calendar;
         try{
@@ -198,6 +239,7 @@ public class IncomeExpense extends JTabbedPane {
 
     //метод для заполнения таблицы со счетами, таблицы с расходами и таблицы с доходами
     public void fillTables() {
+        // Тут видимо нужен values() а еще можно испольовать forEach((key, value) -> {})
         Set<Map.Entry<String, MyAccount>> entrySet = accountsMap.entrySet();
 
         for (Map.Entry<String, MyAccount> x : entrySet) {
@@ -206,6 +248,7 @@ public class IncomeExpense extends JTabbedPane {
                     myAccount.getEarnings(), myAccount.getStartBalance(), myAccount.getBalance()});
         }
 
+        // Может сделать все за один проход?
         for (MyExpense x : expensesSet) {
             expenses.getTableModelExpense().addRow(new Object[]{x.getGregorianCalendar(), x.getNameMyAccount(),
                     x.getCategory(), x.getSubcategory(),
@@ -225,6 +268,9 @@ public class IncomeExpense extends JTabbedPane {
             edit = false;
             ArrayList<MyAccount> tempListAccounts = new ArrayList<>();
             Set<String> namesAccountsSet = accountsMap.keySet();
+
+            // Нам настолько важно повторное использование диалогового окна что мы выделили под него
+            // целое поле и возимся с ленивой инициализацией?
 
             //при первом обращении конструируется диалоговое окно
             if (dialogAccount == null) dialogAccount = new DialogAccount();

@@ -3,6 +3,7 @@ import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.*;
+import java.nio.file.Files;
 import java.util.*;
 
 
@@ -29,7 +30,7 @@ public class FrameBookkeeping extends JFrame {
     public class BookkeepingWindowListener extends WindowAdapter{
         @Override
         public void windowClosed(WindowEvent e) {
-
+            // Метод переопределять необязательно
         }
 
         @Override
@@ -42,6 +43,7 @@ public class FrameBookkeeping extends JFrame {
             if(accountsMap.size() > 0){
                 try{
                     File fileOutput = new File(System.getProperty("user.dir") + "\\Data\\AccountMap.txt");
+                    // Files.newBufferedWriter()
                     BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fileOutput), "UTF-8"));
                     for(String nameAccount : namesAccountsSet){
                         MyAccount x = accountsMap.get(nameAccount);
@@ -61,8 +63,10 @@ public class FrameBookkeeping extends JFrame {
                 } catch (IOException exception){
                     exception.printStackTrace();
                 }
+                // accountMap.isEmpty()
             } else if (accountsMap.size() == 0){
                 try {
+                    // Логику записи пустой и непустой коллекции лучше объединить
                     File fileOutput = new File(System.getProperty("user.dir") + "\\Data\\AccountMap.txt");
                     BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fileOutput), "UTF-8"));
                     writer.write("");
@@ -72,6 +76,8 @@ public class FrameBookkeeping extends JFrame {
                 }
 
             }
+            // Логика записи файлов с разными сущьностями отлиается только тем как сущьность трансформируется в
+            // строку. Надо подумать над обстракцией
             if (expensesSet.size() > 0){
                 try {
                     File fileOutputExpenses = new File(System.getProperty("user.dir") + "\\Data\\ExpenseSet.txt");

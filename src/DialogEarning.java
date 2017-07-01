@@ -100,6 +100,8 @@ public class DialogEarning extends DialogParent{
     }
 
     public void fillVectorCategory(File fileCategory){
+        // Почему именно vector вместо List<>?
+        // Нам нужна какая-то синхронизация? Есть более современные потокобезопасные коллекции
         vectorCategory = new Vector<>();
 
         mapCategory = new TreeMap<>();
@@ -133,8 +135,12 @@ public class DialogEarning extends DialogParent{
         String nameMyAccount = (String) namesMyAccount.getSelectedItem();
         String sumStr = sumTextField.getText();
         sumStr = sumStr.replace(",", ".");
+        // Этот символ сколее всего можно представить в виде строки более простым способом
         sumStr = sumStr.replace(new String(new char[]{160}), "");
         boolean startZero = true;
+
+        // 1. Скорее всего такое можно решить одним регулярным выражением. (См. группы в регулярных выражениях)
+        // 2. Это нужно либо вынести в отельный метод и лучше в отдельный класс вроде NumericUtils
         if (sumStr.matches("0+\\.0+")){
             startZero = false;
         }
@@ -158,6 +164,9 @@ public class DialogEarning extends DialogParent{
         //создать диалоговое окно в унаследованном методе от DialogParent
         showDialog(parent, title);
         fillNamesMyAccount(namesAccountsSet);
+
+        // Еще один аргумент против переиспользования окон - нужно задумываться об их приведении в
+        // исходное каждый раз при открытии
 
         //обнулить поля в диалоговом окне
         sumTextField.setText("0.00");
@@ -239,6 +248,8 @@ public class DialogEarning extends DialogParent{
         @Override
         public void actionPerformed(ActionEvent e) {
             String strSum = sumTextField.getText();
+
+            // Снова дублирующаяся логика которую нужно сложить в одно место
             strSum = strSum.replace(new String(new char[]{160}), "");
             strSum = strSum.replace(",", ".");
             boolean startZero = true;

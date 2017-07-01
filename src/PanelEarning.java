@@ -27,6 +27,7 @@ public class PanelEarning extends JPanel {
             x.setFont(new Font("SansSerif", Font.PLAIN, 14));
         }
 
+        // Лучше вынесты в static поле
         //создание таблицы для отображения счетов, добавление таблицы на панель
         String[] columnNames = {"Дата",
                 "Счет",
